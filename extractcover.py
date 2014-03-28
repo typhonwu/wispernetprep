@@ -32,7 +32,7 @@ def extractThumbnail(infile, tmpdir):
             copyCover(destdir, infile, os.path.join(imgdir, imageName), ".cover")
     if imageName is None:
         print 'Neither Cover nor ThumbNail found'
-        imgpath = max([fname for fname in glob.glob(os.path.join(imgdir, "*"))], key=os.path.getsize)
+        imgpath = max(glob.glob(os.path.join(imgdir, "*")), key=os.path.getsize)
         print 'Fake Cover Image "%s"' % os.path.split(imgpath)[1]
         copyCover(destdir, infile, imgpath, ".cover")
 
