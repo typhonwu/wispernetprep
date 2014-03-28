@@ -21,9 +21,7 @@ def extractThumbnail(infile, tmpdir):
             print "Error: Cover Thumbnail image %s was not recognized as a valid image" % imageNumber
         else:
             print 'Cover ThumbNail Image "%s"' % imageName
-            infileName = os.path.splitext(infile)[0]
-            imageExt = os.path.splitext(imageName)[1]
-            shutil.copy(os.path.join(imgdir, imageName), os.path.join(destdir, infileName + ".thumbnail"+imageExt))
+            copyCover(destdir, infile, os.path.join(imgdir, imageName), ".thumbnail")
     if 'CoverOffset' in metadata:
         imageNumber = int(metadata['CoverOffset'][0])
         imageName = imgnames[imageNumber]
@@ -31,16 +29,17 @@ def extractThumbnail(infile, tmpdir):
             print "Error: Cover image %s was not recognized as a valid image" % imageNumber
         else:
             print 'Cover Image "%s"' % imageName
-            infileName = os.path.splitext(infile)[0]
-            imageExt = os.path.splitext(imageName)[1]
-            shutil.copy(os.path.join(imgdir, imageName), os.path.join(destdir, infileName + ".cover"+imageExt))
+            copyCover(destdir, infile, os.path.join(imgdir, imageName), ".cover")
     if imageName is None:
         print 'Neither Cover nor ThumbNail found'
-        imageName = max([fname for fname in glob.glob(os.path.join(imgdir, "*"))], key=os.path.getsize)
-        print 'Fake Cover Image "%s"' % imageName
-        infileName = os.path.splitext(infile)[0]
-        imageExt = os.path.splitext(imageName)[1]
-        shutil.copy(imageName, os.path.join(destdir, infileName + ".cover"+imageExt))
+        imgpath = max([fname for fname in glob.glob(os.path.join(imgdir, "*"))], key=os.path.getsize)
+        print 'Fake Cover Image "%s"' % os.path.split(imgpath)[1]
+        copyCover(destdir, infile, imgpath, ".cover")
+
+def copyCover(destdir, infile, imgpath, suffix):
+    infileName = os.path.splitext(infile)[0]
+    imageExt = os.path.splitext(imgpath)[1]
+    shutil.copy(imgpath, os.path.join(destdir, infileName + suffix+imageExt))
 
 def processFile(infile):
     infileext = os.path.splitext(infile)[1].upper()
