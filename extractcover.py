@@ -1,17 +1,19 @@
-import sys, os
+import sys, os, glob
 import mobiunpack32
 import shutil
 
-def extractThumbnail(infile, outdir):
-    files = mobiunpack32.fileNames(infile, outdir)
+def extractThumbnail(infile, tmpdir):
+    files = mobiunpack32.fileNames(infile, tmpdir)
     
     # Instantiate the mobiUnpack class    
     mu = mobiunpack32.mobiUnpack(files)
     metadata = mu.getMetaData()
     proc = mobiunpack32.processHTML(files, metadata)
     imgnames = proc.processImages(mu.firstimg, mu.sect)
+    imgdir = os.path.join(tmpdir, "images")
     destdir = "images.$$$"
     os.mkdir(destdir)
+    imageName = None
     if 'ThumbOffset' in metadata:
         imageNumber = int(metadata['ThumbOffset'][0])
         imageName = imgnames[imageNumber]
@@ -21,7 +23,7 @@ def extractThumbnail(infile, outdir):
             print 'Cover ThumbNail Image "%s"' % imageName
             infileName = os.path.splitext(infile)[0]
             imageExt = os.path.splitext(imageName)[1]
-            shutil.copy(os.path.join("tmpdir.$$$", "images", imageName), os.path.join(destdir, infileName + ".thumbnail"+imageExt))
+            shutil.copy(os.path.join(imgdir, imageName), os.path.join(destdir, infileName + ".thumbnail"+imageExt))
     if 'CoverOffset' in metadata:
         imageNumber = int(metadata['CoverOffset'][0])
         imageName = imgnames[imageNumber]
@@ -31,7 +33,14 @@ def extractThumbnail(infile, outdir):
             print 'Cover Image "%s"' % imageName
             infileName = os.path.splitext(infile)[0]
             imageExt = os.path.splitext(imageName)[1]
-            shutil.copy(os.path.join("tmpdir.$$$", "images", imageName), os.path.join(destdir, infileName + ".cover"+imageExt))
+            shutil.copy(os.path.join(imgdir, imageName), os.path.join(destdir, infileName + ".cover"+imageExt))
+    if imageName is None:
+        print 'Neither Cover nor ThumbNail found'
+        imageName = max([fname for fname in glob.glob(os.path.join(imgdir, "*"))], key=os.path.getsize)
+        print 'Fake Cover Image "%s"' % imageName
+        infileName = os.path.splitext(infile)[0]
+        imageExt = os.path.splitext(imageName)[1]
+        shutil.copy(imageName, os.path.join(destdir, infileName + ".cover"+imageExt))
 
 def processFile(infile):
     infileext = os.path.splitext(infile)[1].upper()
