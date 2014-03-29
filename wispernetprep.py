@@ -3,6 +3,7 @@ import shutil
 import extractcover, preparecover
 import glob
 from subprocess import Popen, PIPE, STDOUT
+import argparse
 
 def processFile(infile, imgtext):
     infilename = os.path.splitext(infile)[0]
@@ -35,14 +36,16 @@ def processFile(infile, imgtext):
     return 0
 
 def main(argv=sys.argv):
-    numofparams = len(argv)-1
-    if numofparams < 1 or numofparams > 2:
-        print "Usage:"
-        print "  wispernetprep.py infile [<sequence number>|auto]"
-        return 1
-    else:
-        extractcover.main(argv[0:2])
-        return processFile(argv[1], argv[2] if numofparams == 2 else None)
+    
+    parser = argparse.ArgumentParser()
+    parser.add_argument('input_file', metavar='<input file>', help='Input file')
+    parser.add_argument('-seq', '--sequence-number',  nargs='?', help='A number to stamp on the cover ("auto" for first one-two characters of the name)')
+    
+    args = parser.parse_args()
+    print args
+
+    extractcover.processFile(args.input_file)
+    return processFile(args.input_file, args.sequence_number)
 
 if __name__ == "__main__":
     sys.exit(main())
