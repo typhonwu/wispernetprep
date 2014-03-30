@@ -1,25 +1,9 @@
 import sys, os, inspect
+import argparse
 
-def draw(imgname, imgtext):
-    #add/not add book number in sequence
-    if imgtext == None: return
-    print "Drawing:", imgtext
-    if imgtext=='auto':
-        seqnum = imgname[0] + (imgname[1] if imgname[1].isdigit() else "")
-        if seqnum.isdigit():
-            txt2img(seqnum,img_in = imgname,img_out = imgname)
-        else:
-            print "Warning: name does not start with digits", seqnum  
-    else:
-        #actions for drawing number
-        #draw user defined book sequence number
-        if not imgtext.isdigit():
-            print "Error: image text should be digits only"
-            return 1
-        #seqnum = imgtext[0:2].zfill(2)
-        seqnum = imgtext[0:2]
-        print "Sequence number:", seqnum
-        txt2img(seqnum,img_in = imgname,img_out = imgname)
+def draw(imgname, title, seqnum):
+    print "Drawing:", seqnum, title
+    txt2img(title, seqnum, imgname, imgname)
 
 def resize(img_in):
     try:
@@ -31,43 +15,88 @@ def resize(img_in):
         print "Error:", e
         print "Warning: Pillow is not installed - image not resized"
 
-def txt2img(text, img_in, img_out):
+def txt2img(title, seqnum, img_in, img_out):
     try:
         from PIL import Image, ImageDraw, ImageFont
         img = Image.open(img_in)
+        #prepare font
         font = 'PTC55F.ttf'
+        #font = 'ARIALBD.TTF'
         font_size = 35
         font_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-        fnt = ImageFont.truetype(os.path.join(font_dir, font), font_size)
-        mask = Image.new('L', img.size, 'black')       # make a mask that masks out all
-        draw = ImageDraw.Draw(img)                     # setup to draw on the main image
-        drawmask = ImageDraw.Draw(mask)                # setup to draw on the mask
-        width,height = img.size
+        #prepare black/white text background
+        width, height = img.size
         # mask position
-        xmask = 1.10*font_size
-        ymask = height - 1.10*font_size
+        xmask = 1.10 * font_size
+        ymask = height - 1.10 * font_size
         haxis = font_size
-        drawmask.ellipse((xmask - haxis, ymask - haxis, xmask + haxis, ymask + haxis),fill=255)
-        img.paste(0, mask=mask)                    # put the (somewhat) transparent bg on the main
-        textwidth, textheight = fnt.getsize(text)
-        draw.text((xmask-0.5*textwidth, ymask - 0.5*textheight), text, font=fnt, fill=(255,255,255,255))
-        del draw
+        #
+        #Select colors
+        #
+        #bgcolor = 'white'
+        #txtcolor = 'black'
+        bgcolor = 'black'
+        txtcolor = 'white'
+        draw = ImageDraw.Draw(img)  # setup to draw on the main image
+
+        if seqnum is not None:
+            fnt = ImageFont.truetype(os.path.join(font_dir, font), font_size)
+            textwidth, textheight = fnt.getsize(seqnum)
+            #
+            #draw sequence number
+            #
+            #draw number background
+            draw.ellipse((xmask - haxis, ymask - haxis, xmask + haxis, ymask + haxis), fill=bgcolor)
+            #draw number
+            draw.text((xmask - 0.5 * textwidth, ymask - 0.5 * textheight), seqnum, font=fnt, fill=txtcolor)
+
+        if title is not None:
+            font_size2 = 15
+            fnt2 = ImageFont.truetype(os.path.join(font_dir, font), font_size2)
+            text2 = title.decode('utf-8').upper()
+            if seqnum is not None:
+                draw.line((xmask + 0.5*haxis, ymask, xmask + haxis + 0.7 * width, ymask),fill=bgcolor,width=int(1.4*haxis))
+                margin = xmask + haxis
+                titlelength = 18
+            else:
+                draw.line(( 0, ymask, width, ymask),fill=bgcolor,width=int(1.4*haxis))
+                margin = 0.5*fnt2.getsize(text2)[1]
+                titlelength = 27
+            textwidth2, textheight2 = fnt2.getsize(text2)
+            offset = ymask - 0.25*textheight2 if len(text2)<=20 else ymask - 0.6*textheight
+            #
+            #No wrap drawing
+            #
+            splits=[text2[x:x+titlelength] for x in range(0,len(text2),titlelength)]
+            ystep = fnt2.getsize(text2)[1]
+            for i in range (len(splits) if len(splits)<3 else 3):
+                line = splits[i]
+                draw.text((margin, offset), line, font=fnt2, fill=txtcolor)
+                offset += ystep
+            #
+            # This is wrapping alternative
+            #
+            #for line in textwrap.wrap(text2, width=titlelength):
+            #    draw.text((margin, offset), line, font=fnt2, fill=txtcolor)
+            #    offset += fnt2.getsize(line)[1]
+
         img.save(img_out, "JPEG", quality=100)
+        del draw
     except ImportError as e:
         print "Error:", e
         print "Warning: Pillow is not installed - image text not drawn"
 
 def main(argv=sys.argv):
-    if len(argv) < 2:
-        print "Usage:"
-        print "  preparecover.py infile [seqnum]"
-        return 1
-    else:  
-        infile = argv[1]
-        resize(infile)
-        if (len(argv)==3):
-            print "Drawing", argv[2], "on", infile
-            draw(infile, argv[2])
+    parser = argparse.ArgumentParser()
+    parser.add_argument('input_file', metavar='<input file>', help='Input file')
+    parser.add_argument('-s', '--sequence-number',  nargs='?', help='A number to stamp on the cover')
+    parser.add_argument('-t', '--title',  nargs='?', help='A text to stamp on the cover')
+    
+    args = parser.parse_args()
+    print args
+
+    resize(args.input_file)
+    draw(args.input_file, args.title, args.sequence_number)
 
 
 if __name__ == "__main__":
