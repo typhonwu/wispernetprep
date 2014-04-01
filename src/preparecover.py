@@ -38,22 +38,26 @@ def txt2img(title, seqnum, img_in, img_out):
         bgcolor = 'black'
         txtcolor = 'white'
         draw = ImageDraw.Draw(img)  # setup to draw on the main image
-
+        fnt = ImageFont.truetype(os.path.join(font_dir, font), font_size)
         if seqnum is not None:
-            fnt = ImageFont.truetype(os.path.join(font_dir, font), font_size)
-            textwidth, textheight = fnt.getsize(seqnum)
             #
             #draw sequence number
             #
             #draw number background
             draw.ellipse((xmask - haxis, ymask - haxis, xmask + haxis, ymask + haxis), fill=bgcolor)
             #draw number
+            textwidth, textheight = fnt.getsize(seqnum)
             draw.text((xmask - 0.5 * textwidth, ymask - 0.5 * textheight), seqnum, font=fnt, fill=txtcolor)
 
         if title is not None:
+            # this is to calculate vertical position of text bg based on text parameter in general used
+            # for a sequence number (only textheight needed)
+            fake_text = 'fake'
+            # parameters of title text
+            textwidth, textheight = fnt.getsize(fake_text)
             font_size2 = 15
             fnt2 = ImageFont.truetype(os.path.join(font_dir, font), font_size2)
-            text2 = title.decode('utf-8').upper()
+            text2 = title.upper()
             if seqnum is not None:
                 draw.line((xmask + 0.5*haxis, ymask, xmask + haxis + 0.7 * width, ymask),fill=bgcolor,width=int(1.4*haxis))
                 margin = xmask + haxis
@@ -91,7 +95,7 @@ def main(argv=sys.argv):
     parser.add_argument('input_file', metavar='<input file>', help='Input file')
     parser.add_argument('-s', '--sequence-number',  nargs='?', help='A number to stamp on the cover')
     parser.add_argument('-t', '--title',  nargs='?', help='A text to stamp on the cover')
-    
+
     args = parser.parse_args()
     print args
 
