@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+#-*- coding: utf-8 -*-
 import sys, os, inspect
 import shutil
 import extractcover, preparecover
@@ -38,7 +40,7 @@ def processFile(infile, seqnumber, title, asin):
     print 'Seq number: "%s"' % seqnumber 
     if title is not None or seqnumber is not None:
         preparecover.draw("thumbnail_" + infilename + "_EBOK_portrait.jpg", title, seqnumber)
-
+    
     return 0
 
 def get_booktitle(infile, title):
@@ -47,10 +49,11 @@ def get_booktitle(infile, title):
         files = mobiunpack32.fileNames(infile, "tmpdir2.$$$")
         mu = mobiunpack32.mobiUnpack(files)
         metadata = mu.getMetaData()
-        bktitle = unicode(mu.title, mu.codec).encode("utf-8")
+        bktitle = unicode(mu.title, mu.codec)
         shutil.rmtree("tmpdir2.$$$")
         return bktitle
-    return title
+    u_str = unicode(title, 'cp1251')
+    return u_str
 
 def get_seqnumber(infilename, seqnumber):
     if seqnumber is None: return None
