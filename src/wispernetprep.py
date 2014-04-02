@@ -7,6 +7,7 @@ import mobiunpack32
 import glob
 from subprocess import Popen, PIPE, STDOUT
 import argparse
+import unicodefix
 
 def processFile(infile, seqnumber, title, asin):
     infilename = os.path.splitext(infile)[0]
@@ -44,16 +45,14 @@ def processFile(infile, seqnumber, title, asin):
     return 0
 
 def get_booktitle(infile, title):
-    if title is None: return None
+    title = unicode(title, sys.stdin.encoding)
     if title == 'auto':
         files = mobiunpack32.fileNames(infile, "tmpdir2.$$$")
         mu = mobiunpack32.mobiUnpack(files)
         metadata = mu.getMetaData()
-        bktitle = unicode(mu.title, mu.codec)
+        title = unicode(mu.title, mu.codec)
         shutil.rmtree("tmpdir2.$$$")
-        return bktitle
-    u_str = unicode(title, 'cp1251')
-    return u_str
+    return title
 
 def get_seqnumber(infilename, seqnumber):
     if seqnumber is None: return None

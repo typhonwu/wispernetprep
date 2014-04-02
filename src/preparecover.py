@@ -1,5 +1,6 @@
 import sys, os, inspect
 import argparse
+import unicodefix
 
 def draw(imgname, title, seqnum):
     print "Drawing:", seqnum, title
