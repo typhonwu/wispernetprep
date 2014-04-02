@@ -7,7 +7,6 @@ import extractcover
 import glob
 from subprocess import Popen, PIPE, STDOUT
 import mobiunpack32
-from image_utils import ImageText
 
 def processFile(infile, imgtext, asin):
     #asin is a third CIL parameter.
