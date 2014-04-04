@@ -45,6 +45,7 @@ def processFile(infile, seqnumber, title, asin):
     return 0
 
 def get_booktitle(infile, title):
+    if title is None: return None
     title = unicode(title, sys.stdin.encoding)
     if title == 'auto':
         files = mobiunpack32.fileNames(infile, "tmpdir2.$$$")
