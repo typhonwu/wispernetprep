@@ -1,0 +1,34 @@
+Palmdoc compression
+Unpack raw html
+Warning: Unknown metadata with id 524 found
+Warning: Unknown metadata with id 125 found
+Warning: Unknown metadata with id 131 found
+Decode images
+Warning: Section 444 contains no image or an unknown image format
+Warning: Section 445 contains no image or an unknown image format
+Warning: Section 446 contains no image or an unknown image format
+Warning: Section 447 contains no image or an unknown image format
+Warning: Section 448 contains no image or an unknown image format
+Warning: Section 449 contains no image or an unknown image format
+Neither Cover nor ThumbNail found
+Fake Cover Image "image00001.jpeg"
+Completed
+Running java -cp "C:\Users\Samuil\Dist\e-books converters\Convert with covers 2\MobiMetaEditorV0.16.jar" cli.WhisperPrep
+ "input.$$$" "output.$$$"
+********************
+File 1/1
+Filename: Voina i Mir Rus Meta.mobi
+Fullname: Aieia e Ie?
+Author: Eaa Oienoie
+ASIN [0a73bcaf-f4a4-4e47-b2aa-e4fbfef87a77]:
+<Unicode console stdout>.write: IOError('WriteConsoleW returned 0, n.value = 0L',)
+Traceback (most recent call last):
+  File "C:\Users\Samuil\Dist\e-books converters\Convert with covers 2\\wispernetprep.py", line 85, in <module>
+    sys.exit(main())
+  File "C:\Users\Samuil\Dist\e-books converters\Convert with covers 2\\wispernetprep.py", line 82, in main
+    return processFile(input_file, args.sequence_number, args.title, args.asin)
+  File "C:\Users\Samuil\Dist\e-books converters\Convert with covers 2\\wispernetprep.py", line 39, in processFile
+    print u'Title: "%s"' % title
+  File "C:\Users\Samuil\Dist\e-books converters\Convert with covers 2\unicodefix.py", line 126, in write
+    raise IOError("WriteConsoleW returned %r, n.value = %r" % (retval, n.value))
+IOError: WriteConsoleW returned 0, n.value = 0L

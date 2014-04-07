@@ -1,0 +1,34 @@
+        Generating KF8 markup...
+        Compressing markup...
+        Creating indices...
+AZW3 output written to Non-ASCII text detected. You must set your Console's font to Lucida Console or Consolas or some o
+ther TrueType font to see this text -- C:\Users\Samuil\Dist\Books\Fiction\3. Russian Books \1.Test\Voina i Mir Rus Meta.
+azw3
+Output saved to   Non-ASCII text detected. You must set your Console's font to Lucida Console or Consolas or some other
+TrueType font to see this text -- C:\Users\Samuil\Dist\Books\Fiction\3. Russian Books \1.Test\Voina i Mir Rus Meta.azw3
+
+C:\Users\Samuil\Dist\Books\Fiction\3. Russian Books \1.Test>callThe system cannot write to the specified device.
+
+
+C:\Users\Samuil\Dist\Books\Fiction\3. Russian Books \1.Test>pythonThe system cannot write to the specified device.
+
+Namespace(asin=None, input_file='\xd0\x92\xd0\xbe\xd0\xb9\xd0\xbd\xd0\xb0 \xd0\xb8 \xd0\x9c\xd0\xb8\xd1\x80 Rus Meta.azw
+3', sequence_number='23', title='\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd \xef\xbf\xbd\xef\xbf\xbd\x
+ef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd \xef\xbf\xbd\
+xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd')
+Extracting...
+Traceback (most recent call last):
+  File "C:\Users\Samuil\Dist\e-books converters\Convert with covers 2\\wispernetprep.py", line 85, in <module>
+    sys.exit(main())
+  File "C:\Users\Samuil\Dist\e-books converters\Convert with covers 2\\wispernetprep.py", line 81, in main
+    extractcover.processFile(input_file)
+  File "C:\Users\Samuil\Dist\e-books converters\Convert with covers 2\extractcover.py", line 53, in processFile
+    extractThumbnail(infile, "tmpdir.$$$");
+  File "C:\Users\Samuil\Dist\e-books converters\Convert with covers 2\extractcover.py", line 10, in extractThumbnail
+    mu = mobiunpack32.mobiUnpack(files)
+  File "C:\Users\Samuil\Dist\e-books converters\Convert with covers 2\mobiunpack32.py", line 205, in __init__
+    self.sect = Sectionizer(self.infile, 'rb')
+  File "C:\Users\Samuil\Dist\e-books converters\Convert with covers 2\mobiunpack32.py", line 189, in __init__
+    self.f = file(filename, perm)
+IOError: [Errno 2] No such file or directory: u'\u2568\u0422\u2568\u255b\u2568\u2563\u2568\u255c\u2568\u2591 \u2568\u255
+5 \u2568\u042c\u2568\u2555\u2564\u0410 Rus Meta.azw3'
