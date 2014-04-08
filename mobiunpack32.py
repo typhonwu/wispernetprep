@@ -74,7 +74,7 @@ class fileNames:
 		if not os.path.exists(self.imgdir):
 			os.mkdir(self.imgdir)
 		self.outsrcbasename = os.path.basename(self.outsrc)
-		self.outhtmlbasename =os.path.basename(self.outsrc)
+		self.outhtmlbasename = unicode(os.path.basename(self.outsrc), sys.getfilesystemencoding()).encode("utf-8")
 		
 	def getOutRaw(self, ext):
 		return os.path.join(self.outdir, os.path.splitext(os.path.split(self.infile)[1])[0]) + ext

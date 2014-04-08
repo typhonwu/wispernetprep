@@ -1,7 +1,6 @@
 import sys, os, glob
 import mobiunpack32
 import shutil
-import unicodefix
 
 def extractThumbnail(infile, tmpdir):
     files = mobiunpack32.fileNames(infile, tmpdir)

@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-#-*- coding: utf-8 -*-
 import sys, os, inspect
 import shutil
 import extractcover, preparecover
@@ -7,53 +5,54 @@ import mobiunpack32
 import glob
 from subprocess import Popen, PIPE, STDOUT
 import argparse
-import unicodefix
+import locale
 
 def processFile(infile, seqnumber, title, asin):
     infilename = os.path.splitext(infile)[0]
     infileext = os.path.splitext(infile)[1]
-    inputdir = u"input.$$$"
-    outputdir = u"output.$$$"
+    inputdir = "input.$$$"
+    outputdir = "output.$$$"
     os.mkdir(inputdir)
     os.mkdir(outputdir)
-    shutil.copy(infile, os.path.join(inputdir, infilename+u".mobi"))
-    for file in glob.glob(os.path.join(u"images.$$$", infilename+u'.cover*')):
-        imgname = u"thumbnail_" + infilename + u"_EBOK_portrait.jpg"
+    shutil.copy(infile, os.path.join(inputdir, infilename+".mobi"))
+    for file in glob.glob(os.path.join("images.$$$", infilename+'.cover*')):
+        imgname = "thumbnail_" + infilename + "_EBOK_portrait.jpg"
         shutil.copy(file, imgname)
         preparecover.resize(imgname)    
 
     scriptdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-    cmd = u'java -cp "' + os.path.join(scriptdir, u"MobiMetaEditorV0.16.jar") +u'" cli.WhisperPrep "%s" "%s"' % (inputdir, outputdir)
-    print u"Running", cmd
+    cmd = 'java -cp "' + os.path.join(scriptdir, "MobiMetaEditorV0.16.jar") +'" cli.WhisperPrep "%s" "%s"' % (inputdir, outputdir)
+    print "Running", cmd
     process = Popen(cmd, stdin=PIPE, stdout=sys.stdout, stderr=STDOUT)
-    process.stdin.write(infilename.encode("utf-8") if asin is None else asin)
+    process.stdin.write(infilename if asin is None else asin)
     process.stdin.write("\n")
     process.stdin.close()
     process.wait()
-    shutil.copy(os.path.join(outputdir, infilename+u".mobi"), infilename+u".processed"+infileext)
-    shutil.rmtree(u"images.$$$")
+    shutil.copy(os.path.join(outputdir, infilename+".mobi"), infilename+".processed"+infileext)
+    shutil.rmtree("images.$$$")
     shutil.rmtree(inputdir)
     shutil.rmtree(outputdir)
 
     title = get_booktitle(infile, title)
-    print u'Title: "%s"' % title 
+    print 'Title: "%s"' % title 
     seqnumber = get_seqnumber(infilename, seqnumber)
-    print u'Seq number: "%s"' % seqnumber 
+    print 'Seq number: "%s"' % seqnumber 
     if title is not None or seqnumber is not None:
-        preparecover.draw(u"thumbnail_" + infilename + u"_EBOK_portrait.jpg", title, seqnumber)
-    
+        preparecover.draw("thumbnail_" + infilename + "_EBOK_portrait.jpg", title, seqnumber)
+
     return 0
 
 def get_booktitle(infile, title):
     if title is None: return None
-    title = unicode(title, sys.stdin.encoding)
     if title == 'auto':
         files = mobiunpack32.fileNames(infile, "tmpdir2.$$$")
         mu = mobiunpack32.mobiUnpack(files)
         metadata = mu.getMetaData()
-        title = unicode(mu.title, mu.codec)
+        bktitle = unicode(mu.title, mu.codec)
         shutil.rmtree("tmpdir2.$$$")
-    return title
+        return bktitle
+    u_str = unicode(title, 'cp1251')
+    return u_str
 
 def get_seqnumber(infilename, seqnumber):
     if seqnumber is None: return None
@@ -76,10 +75,8 @@ def main(argv=sys.argv):
     args = parser.parse_args()
     print args
 
-    input_file = unicode(args.input_file, sys.stdin.encoding)
-
-    extractcover.processFile(input_file)
-    return processFile(input_file, args.sequence_number, args.title, args.asin)
+    extractcover.processFile(args.input_file)
+    return processFile(args.input_file, args.sequence_number, args.title, args.asin)
 
 if __name__ == "__main__":
     sys.exit(main())
