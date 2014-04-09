@@ -1,0 +1,69 @@
+
+C:\Users\Samuil\Dist\e-books converters\Wisper Cover Branches\Cyrillic-test>ebook-convert "‚®©­  Ё ЊЁа Rus Meta.epub" "‚®©­  Ё ЊЁа Rus Meta.azw3" 
+1% Converting input to HTML...
+InputFormatPlugin: EPUB Input running
+on C:\Users\Samuil\Dist\e-books converters\Wisper Cover Branches\Cyrillic-test\Война и Мир Rus Meta.epub
+Parsing all content...
+34% Running transforms on ebook...
+Merging user specified metadata...
+Detecting structure...
+Flattening CSS and remapping font sizes...
+Failed to parse CSS selector: u'h|span.inlinenote:'
+Source base font size is 15.36000pt
+Removing fake margins...
+Removing level p_2 left margin of: -3pt
+Removing level p_2 right margin of: -3pt
+Removing level p_3 left margin of: -3pt
+Removing level p_3 right margin of: -3pt
+Cleaning up manifest...
+Trimming unused files from manifest...
+Creating AZW3 Output...
+67% Running AZW3 Output plugin
+Serializing resources...
+Splitting markup on page breaks and flow limits, if any...
+Creating KF8 output
+	Generating KF8 markup...
+	Compressing markup...
+	Creating indices...
+AZW3 output written to C:\Users\Samuil\Dist\e-books converters\Wisper Cover Branches\Cyrillic-test\Война и Мир Rus Meta.azw3
+Output saved to   C:\Users\Samuil\Dist\e-books converters\Wisper Cover Branches\Cyrillic-test\Война и Мир Rus Meta.azw3
+
+C:\Users\Samuil\Dist\e-books converters\Wisper Cover Branches\Cyrillic-test>chcp 65001 
+Active code page: 65001
+
+C:\Users\Samuil\Dist\e-books converters\Wisper Cover Branches\Cyrillic-test>call wispernetprep.cmd -t auto -s 23  "Р’РѕР№РЅР° Рё РњРёСЂ Rus Meta.azw3" 
+
+C:\Users\Samuil\Dist\e-books converters\Wisper Cover Branches\Cyrillic-test>python "C:\Users\Samuil\Dist\e-books converters\Convert with covers 2\\wispernetprep.py" -t auto -s 23  "Р’РѕР№РЅР° Рё РњРёСЂ Rus Meta.azw3" 
+Namespace(asin=None, input_file='\xd0\x92\xd0\xbe\xd0\xb9\xd0\xbd\xd0\xb0 \xd0\xb8 \xd0\x9c\xd0\xb8\xd1\x80 Rus Meta.azw3', sequence_number='23', title='auto')
+Extracting...
+Palmdoc compression
+Unpack raw html
+Warning: Unknown metadata with id 524 found
+Warning: Unknown metadata with id 125 found
+Warning: Unknown metadata with id 131 found
+Decode images
+Warning: Section 444 contains no image or an unknown image format
+Warning: Section 445 contains no image or an unknown image format
+Warning: Section 446 contains no image or an unknown image format
+Warning: Section 447 contains no image or an unknown image format
+Warning: Section 448 contains no image or an unknown image format
+Warning: Section 449 contains no image or an unknown image format
+Neither Cover nor ThumbNail found
+Fake Cover Image "image00002.jpeg"
+Completed
+utf-8
+Running java -cp "C:\Users\Samuil\Dist\e-books converters\Convert with covers 2\MobiMetaEditorV0.16.jar" cli.WhisperPrep "input.$$$" "output.$$$"
+********************
+File 1/1
+Filename: Война и Мир Rus Meta.mobi
+Fullname: Война и мир
+Author: Лев Толстой
+ASIN [b45a18bb-2069-4e58-bf27-5383144b2f6a]: 
+Palmdoc compression
+Unpack raw html
+Warning: Unknown metadata with id 524 found
+Warning: Unknown metadata with id 125 found
+Warning: Unknown metadata with id 131 found
+Title: "Р’РѕР№РЅР° Рё РјРёСЂ"
+Seq number: "23"
+Drawing: 23 Р’РѕР№РЅР° Рё РјРёСЂ
