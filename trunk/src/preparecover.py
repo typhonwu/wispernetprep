@@ -1,9 +1,17 @@
 import sys, os, inspect
 import argparse
 import unicodefix
+from wispernetprep import translit
 
 def draw(imgname, title, seqnum):
-    print "Drawing:", seqnum, title
+    if title==None:
+        print "Drawing:", seqnum, "No title"
+    else:
+        try:
+            print "Drawing:", seqnum, title
+        except:
+            tit = translit(title)
+            print "Drawing:", seqnum, tit
     txt2img(title, seqnum, imgname, imgname)
 
 def resize(img_in):
