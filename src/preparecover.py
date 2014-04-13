@@ -1,7 +1,7 @@
 import sys, os, inspect
 import argparse
 import unicodefix
-from wispernetprep import translit
+from unidecode import unidecode
 
 def draw(imgname, title, seqnum):
     if title==None:
@@ -10,8 +10,8 @@ def draw(imgname, title, seqnum):
         try:
             print "Drawing:", seqnum, title
         except:
-            tit = translit(title)
-            print "Drawing:", seqnum, tit
+            print "Drawing:", seqnum, unidecode(title)
+            pass
     txt2img(title, seqnum, imgname, imgname)
 
 def resize(img_in):
