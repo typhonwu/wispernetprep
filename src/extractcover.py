@@ -34,8 +34,15 @@ def extractThumbnail(infile, tmpdir):
     if imageName is None:
         print 'Neither Cover nor ThumbNail found'
         imgpath = max(glob.glob(os.path.join(imgdir, "*")), key=os.path.getsize)
-        print 'Fake Cover Image "%s"' % os.path.split(imgpath)[1]
-        copyCover(destdir, infile, imgpath, ".cover")
+        if os.path.splitext(os.path.split(imgpath)[1])[1]=='.jpeg':
+            print 'Fake Cover Image "%s"' % os.path.split(imgpath)[1]
+            copyCover(destdir, infile, imgpath, ".cover")
+        else:
+            print 'No candidate for cover image found. Execution interrupted.'
+            shutil.rmtree(tmpdir)
+            shutil.rmtree(destdir)
+            #shutil.rmtree(os.path.split(imgpath)[0] + u"images.$$$")
+            sys.exit(0)
 
 def copyCover(destdir, infile, imgpath, suffix):
     infileName = os.path.splitext(infile)[0]

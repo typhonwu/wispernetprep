@@ -19,7 +19,6 @@ def processFile(infile, seqnumber, title, asin):
     os.mkdir(outputdir)
     shutil.copy(infile, os.path.join(inputdir, infilename+u".mobi"))
     for file in glob.glob(os.path.join(u"images.$$$", infilename+u'.cover*')):
-#        imgname = u"thumbnail_" + translit(infilename) + u"_EBOK_portrait.jpg"
         imgname = u"thumbnail_" + unidecode(infilename) + u"_EBOK_portrait.jpg"
         shutil.copy(file, imgname)
         preparecover.resize(imgname)    
@@ -28,9 +27,6 @@ def processFile(infile, seqnumber, title, asin):
     cmd = u'java -cp "' + os.path.join(scriptdir, u"MobiMetaEditorV0.16.jar") +u'" cli.WhisperPrep "%s" "%s"' % (inputdir, outputdir)
     print u"Running", cmd
     process = Popen(cmd, stdin=PIPE, stdout=sys.stdout, stderr=STDOUT)
-#    process.stdin.write(infilename.encode("utf-8") if asin is None else asin)
-#    process.stdin.write(infilename.encode("cp1251") if asin is None else asin)
-#     process.stdin.write(translit(infilename) if asin is None else asin)
     process.stdin.write(unidecode(infilename) if asin is None else asin)
     process.stdin.write("\n")
     process.stdin.close()
@@ -47,7 +43,6 @@ def processFile(infile, seqnumber, title, asin):
         try:
             print u'Title: "%s"' % title
         except:
-            # tit = translit(title)
             print u'Title: "%s"' % unidecode(title)
         pass
     seqnumber = get_seqnumber(infilename, seqnumber)
@@ -89,7 +84,6 @@ def main(argv=sys.argv):
     
     args = parser.parse_args()
     print args
-    #tprint(args)
     input_file = unicode(args.input_file, sys.stdin.encoding)
 
     extractcover.processFile(input_file)
