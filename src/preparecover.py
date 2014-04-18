@@ -37,7 +37,7 @@ def txt2img(title, seqnum, img_in, img_out, position):
         width, height = img.size
         # mask position
         xmask = 1.10 * font_size
-        if position==None:
+        if position=="bottom":
             ymask = height - 1.10 * font_size
         else:
             ymask = 1.10 * font_size
