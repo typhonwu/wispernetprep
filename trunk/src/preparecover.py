@@ -3,7 +3,7 @@ import argparse
 import unicodefix
 from unidecode import unidecode
 
-def draw(imgname, title, seqnum):
+def draw(imgname, title, seqnum, position):
     if title==None:
         print "Drawing:", seqnum, "No title"
     else:
@@ -12,7 +12,7 @@ def draw(imgname, title, seqnum):
         except:
             print "Drawing:", seqnum, unidecode(title)
             pass
-    txt2img(title, seqnum, imgname, imgname)
+    txt2img(title, seqnum, imgname, imgname, position)
 
 def resize(img_in):
     try:
@@ -24,7 +24,7 @@ def resize(img_in):
         print "Error:", e
         print "Warning: Pillow is not installed - image not resized"
 
-def txt2img(title, seqnum, img_in, img_out):
+def txt2img(title, seqnum, img_in, img_out, position):
     try:
         from PIL import Image, ImageDraw, ImageFont
         img = Image.open(img_in)
@@ -37,7 +37,10 @@ def txt2img(title, seqnum, img_in, img_out):
         width, height = img.size
         # mask position
         xmask = 1.10 * font_size
-        ymask = height - 1.10 * font_size
+        if position==None:
+            ymask = height - 1.10 * font_size
+        else:
+            ymask = 1.10 * font_size
         haxis = font_size
         #
         #Select colors

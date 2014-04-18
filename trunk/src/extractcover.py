@@ -41,7 +41,6 @@ def extractThumbnail(infile, tmpdir):
             print 'No candidate for cover image found. Execution interrupted.'
             shutil.rmtree(tmpdir)
             shutil.rmtree(destdir)
-            #shutil.rmtree(os.path.split(imgpath)[0] + u"images.$$$")
             sys.exit(0)
 
 def copyCover(destdir, infile, imgpath, suffix):
