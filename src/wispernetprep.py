@@ -10,7 +10,7 @@ import argparse
 import unicodefix
 from unidecode import unidecode
 
-def processFile(infile, seqnumber, title, asin):
+def processFile(infile, seqnumber, title, asin, position):
     infilename = os.path.splitext(infile)[0]
     infileext = os.path.splitext(infile)[1]
     inputdir = u"input.$$$"
@@ -48,7 +48,7 @@ def processFile(infile, seqnumber, title, asin):
     seqnumber = get_seqnumber(infilename, seqnumber)
     print u'Seq number: "%s"' % seqnumber
     if title is not None or seqnumber is not None:
-        preparecover.draw(u"thumbnail_" + unidecode(infilename) + u"_EBOK_portrait.jpg", title, seqnumber)
+        preparecover.draw(u"thumbnail_" + unidecode(infilename) + u"_EBOK_portrait.jpg", title, seqnumber, position)
 
     return 0
 
@@ -81,13 +81,14 @@ def main(argv=sys.argv):
     parser.add_argument('-s', '--sequence-number',  nargs='?', help='A number to stamp on the cover ("auto" for first one-two characters of the name of the file)')
     parser.add_argument('-t', '--title',  nargs='?', help='A text to stamp on the cover ("auto" for the title from the metainfo of the book)')
     parser.add_argument('-a', '--asin',  nargs='?', help='A text to put into ASIN metainfo field')
-    
+    parser.add_argument('-p', '--position',  nargs='?',default=None, help='Position of stamp either at the bottom (default) or at the top')
+
     args = parser.parse_args()
     print args
     input_file = unicode(args.input_file, sys.stdin.encoding)
 
     extractcover.processFile(input_file)
-    return processFile(input_file, args.sequence_number, args.title, args.asin)
+    return processFile(input_file, args.sequence_number, args.title, args.asin, args.position)
 
 if __name__ == "__main__":
     sys.exit(main())
