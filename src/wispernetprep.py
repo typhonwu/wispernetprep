@@ -86,13 +86,13 @@ def get_seqnumber(infilename, seqnumber):
 def main(argv=sys.argv):
     
     parser = argparse.ArgumentParser()
-    parser.add_argument('input_file', metavar='<input file>', help='Input file')
+    parser.add_argument('-i', '--input-file', help='Input file')
     parser.add_argument('-s', '--sequence-number', help='A number to stamp on the cover ("auto" for first one-two characters of the name of the file)')
     parser.add_argument('-t', '--title', help='A text to stamp on the cover ("auto" for the title from the metainfo of the book)')
     parser.add_argument('-a', '--asin', help='A text to put into ASIN metainfo field')
     parser.add_argument('-p', '--position', choices=['top', 'bottom'], default='bottom', help='Position of the stamp')
 
-    args = parser.parse_args()
+    args, unknown = parser.parse_known_args()
     print args
     input_file = unicode(args.input_file, sys.stdin.encoding)
 
