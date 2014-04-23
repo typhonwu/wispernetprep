@@ -4,11 +4,21 @@ import sys, os, inspect
 import shutil
 import extractcover, preparecover
 import mobiunpack32
-import glob
+import glob, re
 from subprocess import Popen, PIPE, STDOUT
 import argparse
 import unicodefix
 from unidecode import unidecode
+
+def escape_glob(path):
+    transdict = {
+            '[': '[[]',
+            ']': '[]]',
+            '*': '[*]',
+            '?': '[?]',
+            }
+    rc = re.compile('|'.join(map(re.escape, transdict)))
+    return rc.sub(lambda m: transdict[m.group(0)], path)
 
 def processFile(infile, seqnumber, title, asin, position):
     infilename = os.path.splitext(infile)[0]
@@ -18,7 +28,7 @@ def processFile(infile, seqnumber, title, asin, position):
     os.mkdir(inputdir)
     os.mkdir(outputdir)
     shutil.copy(infile, os.path.join(inputdir, infilename+u".mobi"))
-    for file in glob.glob(os.path.join(u"images.$$$", infilename+u'.cover*')):
+    for file in glob.glob(os.path.join(u"images.$$$", escape_glob(infilename)+u'.cover*')):
         imgname = u"thumbnail_" + unidecode(infilename) + u"_EBOK_portrait.jpg"
         shutil.copy(file, imgname)
         preparecover.resize(imgname)    
@@ -44,7 +54,6 @@ def processFile(infile, seqnumber, title, asin, position):
             print u'Title: "%s"' % title
         except:
             print u'Title: "%s"' % unidecode(title)
-        pass
     seqnumber = get_seqnumber(infilename, seqnumber)
     print u'Seq number: "%s"' % seqnumber
     if title is not None or seqnumber is not None:
