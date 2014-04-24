@@ -29,7 +29,7 @@ def processFile(infile, seqnumber, title, asin, position):
     os.mkdir(outputdir)
     shutil.copy(infile, os.path.join(inputdir, infilename+u".mobi"))
     for file in glob.glob(os.path.join(u"images.$$$", escape_glob(infilename)+u'.cover*')):
-        imgname = u"thumbnail_" + unidecode(infilename) + u"_EBOK_portrait.jpg"
+        imgname = u"thumbnail_" + unidecode(infilename).replace("'","z") + u"_EBOK_portrait.jpg"
         shutil.copy(file, imgname)
         preparecover.resize(imgname)    
 
@@ -37,7 +37,7 @@ def processFile(infile, seqnumber, title, asin, position):
     cmd = u'java -cp "' + os.path.join(scriptdir, u"MobiMetaEditorV0.16.jar") +u'" cli.WhisperPrep "%s" "%s"' % (inputdir, outputdir)
     print u"Running", cmd
     process = Popen(cmd, stdin=PIPE, stdout=sys.stdout, stderr=STDOUT)
-    process.stdin.write(unidecode(infilename) if asin is None else asin)
+    process.stdin.write(unidecode(infilename).replace("'","z") if asin is None else asin)
     process.stdin.write("\n")
     process.stdin.close()
     process.wait()
