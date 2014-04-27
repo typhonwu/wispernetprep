@@ -45,7 +45,8 @@ def processFile(infile, seqnumber, title, asin, position):
     shutil.rmtree(u"images.$$$")
     shutil.rmtree(inputdir)
     shutil.rmtree(outputdir)
-
+    if asin!=None:
+        sys.exit(0)
     title = get_booktitle(infile, title)
     if title==None:
         print "No title"
@@ -58,7 +59,6 @@ def processFile(infile, seqnumber, title, asin, position):
     print u'Seq number: "%s"' % seqnumber
     if title is not None or seqnumber is not None:
         preparecover.draw(u"thumbnail_" + unidecode(infilename) + u"_EBOK_portrait.jpg", title, seqnumber, position)
-
     return 0
 
 def get_booktitle(infile, title):
@@ -94,9 +94,12 @@ def main(argv=sys.argv):
 
     args, unknown = parser.parse_known_args()
     print args
+    # IsAsin = True
+    # if args.asin==None:
+    #     IsAsin = False
     input_file = unicode(args.input_file, sys.stdin.encoding)
 
-    extractcover.processFile(input_file)
+    extractcover.processFile(input_file,args.asin)
     return processFile(input_file, args.sequence_number, args.title, args.asin, args.position)
 
 if __name__ == "__main__":
