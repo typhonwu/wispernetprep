@@ -94,9 +94,6 @@ def main(argv=sys.argv):
 
     args, unknown = parser.parse_known_args()
     print args
-    # IsAsin = True
-    # if args.asin==None:
-    #     IsAsin = False
     input_file = unicode(args.input_file, sys.stdin.encoding)
 
     extractcover.processFile(input_file,args.asin)
