@@ -3,7 +3,7 @@ import mobiunpack32
 import shutil
 import unicodefix
 
-def extractThumbnail(infile, tmpdir):
+def extractThumbnail(infile, tmpdir, asin):
     files = mobiunpack32.fileNames(infile, tmpdir)
     
     # Instantiate the mobiUnpack class    
@@ -38,17 +38,18 @@ def extractThumbnail(infile, tmpdir):
             print 'Fake Cover Image "%s"' % os.path.split(imgpath)[1]
             copyCover(destdir, infile, imgpath, ".cover")
         else:
-            print 'No candidate for cover image found. Execution interrupted.'
-            shutil.rmtree(tmpdir)
-            shutil.rmtree(destdir)
-            sys.exit(0)
+            if asin==None:
+                print 'No candidate for cover image found. Execution interrupted.'
+                shutil.rmtree(tmpdir)
+                shutil.rmtree(destdir)
+                sys.exit(0)
 
 def copyCover(destdir, infile, imgpath, suffix):
     infileName = os.path.splitext(infile)[0]
     imageExt = os.path.splitext(imgpath)[1]
     shutil.copy(imgpath, os.path.join(destdir, infileName + suffix+imageExt))
 
-def processFile(infile):
+def processFile(infile, asin):
     infileext = os.path.splitext(infile)[1].upper()
     if infileext not in ['.MOBI', '.PRC', '.AZW', '.AZW4', '.AZW3']:
         print "Error: first parameter must be a Kindle/Mobipocket ebook or a Kindle/Print Replica ebook."
@@ -56,7 +57,7 @@ def processFile(infile):
 
     try:
         print 'Extracting...'
-        extractThumbnail(infile, "tmpdir.$$$");
+        extractThumbnail(infile, "tmpdir.$$$", asin);
         shutil.rmtree("tmpdir.$$$")
         print 'Completed'
         
