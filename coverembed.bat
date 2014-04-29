@@ -4,8 +4,12 @@ call wispernetprep.cmd -t auto -s auto -i %1 -p bottom
 :: generate book.epub
 python.exe "%~dp0\lib\kindleunpack.py" -s "%~n1.azw3" "%~n1"
 
+:: rename book.epub to avoid removal of original epub (if exists)
+if exist "%~n1.epub" copy "%~n1.epub" "%~n1_original.epub" 
+
 :: copy mobi8\book.epub file into current directory
-copy ".\%~n1\mobi8\%~n1.epub" ".\"
+copy /y ".\%~n1\mobi8\%~n1.epub" ".\"
+
 
 :: remove directory with unpacked files
 rmdir "%~n1" /s /q
