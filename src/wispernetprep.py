@@ -58,7 +58,7 @@ def processFile(infile, seqnumber, title, asin, position):
     seqnumber = get_seqnumber(infilename, seqnumber)
     print u'Seq number: "%s"' % seqnumber
     if title is not None or seqnumber is not None:
-        preparecover.draw(u"thumbnail_" + unidecode(infilename) + u"_EBOK_portrait.jpg", title, seqnumber, position)
+        preparecover.draw(u"thumbnail_" + unidecode(infilename).replace("'","z") + u"_EBOK_portrait.jpg", title, seqnumber, position)
     return 0
 
 def get_booktitle(infile, title):
