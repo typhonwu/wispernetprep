@@ -15,13 +15,23 @@ copy /y ".\%~n1\mobi8\%~n1.epub" ".\"
 rmdir "%~n1" /s /q
 
 ::replace cover in epub
-ebook-polish "%~n1.epub" --cover "thumbnail_%~n1_EBOK_portrait.jpg"
+
+python "%~dp0unidec.py" "%~n1" > tmpFile 
+
+set /p myvar=<tmpFile 
+
+del tmpFile 
+
+ebook-polish "%~n1.epub" --cover "thumbnail_%myvar%_EBOK_portrait.jpg"
+::ebook-polish "%~n1.epub" --cover "thumbnail_%~n1_EBOK_portrait.jpg"
+
 ::ebook-meta "%~n1.epub" --cover "thumbnail_%~n1_EBOK_portrait.jpg"
 
 :: convert epub to mobi
 kindlegen "%~n1_polished.epub" -locale en -o "%~n1.mobi"
 
 ::swap cover and thumb offsets, add EBOK to 501, and create book_cover_inside_azw3
+
 python "%~dp0swap_cover.py" "%~n1.mobi" "%~n1_embedded_cover.azw3" 
 
 ::clean up intermediate files
