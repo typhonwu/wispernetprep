@@ -24,7 +24,10 @@ iswindows = sys.platform.startswith('win')
 
 def pathof(s):
     if isinstance(s, unicode):
-        print "Warning: pathof expects utf-8 encoded byestring: ", s
+        try:
+            print "Warning: pathof expects utf-8 encoded byestring: ", s
+        except Exception as e:
+            pass
         if iswindows:
             return s
         return s.encode('utf-8')
