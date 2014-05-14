@@ -44,10 +44,10 @@ def processFile(infile, seqnumber, title, asin, position):
     cmd = u'python "' + os.path.join(scriptdir, u"dualmetafix.py") +u'" "%s" "%s" "%s"' % (masin, pinfile,poutfile)
 
     # Cyriilc file name fails here
-    subprocess.call(cmd)
+    # subprocess.call(cmd)
 
-    # my failed attempt to call script directly
-    #dualmetafix.main(masin,pinfile,poutfile)
+    args = ["dualmetafix.py",masin,pinfile,poutfile]
+    dualmetafix.main(args)
 
     # scriptdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
     # cmd = u'java -cp "' + os.path.join(scriptdir, u"MobiMetaEditorV0.16.jar") +u'" cli.WhisperPrep "%s" "%s"' % (inputdir, outputdir)

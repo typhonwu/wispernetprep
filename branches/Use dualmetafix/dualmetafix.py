@@ -23,7 +23,10 @@ iswindows = sys.platform.startswith('win')
 
 def pathof(s):
     if isinstance(s, unicode):
-        print "Warning: pathof expects utf-8 encoded byestring: ", s
+        try:
+            print "Warning: pathof expects utf-8 encoded byestring: ", s
+        except:
+            pass
         if iswindows:
             return s
         return s.encode('utf-8')
@@ -322,10 +325,12 @@ def main(argv=utf8_argv()):
     asin = args[0]
     infile = args[1]
     outfile = args[2]
-    print "ASIN:   ", asin
-    print "Input:  ", infile
-    print "Output: ", outfile
-
+    try:
+        print "ASIN:   ", asin
+        print "Input:  ", infile
+        print "Output: ", outfile
+    except:
+        pass
     try:
         # make sure it is really a mobi ebook
         infileext = os.path.splitext(infile)[1].upper()
