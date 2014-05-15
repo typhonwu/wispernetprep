@@ -5,10 +5,12 @@ import shutil
 import extractcover, preparecover
 import mobiunpack32
 import glob, re
+import subprocess
 from subprocess import Popen, PIPE, STDOUT
 import argparse
 import unicodefix
 from unidecode import unidecode
+import dualmetafix
 
 def escape_glob(path):
     transdict = {
@@ -31,16 +33,31 @@ def processFile(infile, seqnumber, title, asin, position):
     for file in glob.glob(os.path.join(u"images.$$$", escape_glob(infilename)+u'.cover*')):
         imgname = u"thumbnail_" + unidecode(infilename).replace("'","z") + u"_EBOK_portrait.jpg"
         shutil.copy(file, imgname)
-        preparecover.resize(imgname)    
-
+        try:
+            preparecover.resize(imgname)
+        except Exception as e:
+            pass
     scriptdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-    cmd = u'java -cp "' + os.path.join(scriptdir, u"MobiMetaEditorV0.16.jar") +u'" cli.WhisperPrep "%s" "%s"' % (inputdir, outputdir)
-    print u"Running", cmd
-    process = Popen(cmd, stdin=PIPE, stdout=sys.stdout, stderr=STDOUT)
-    process.stdin.write(unidecode(infilename).replace("'","z") if asin is None else asin)
-    process.stdin.write("\n")
-    process.stdin.close()
-    process.wait()
+    masin = unidecode(infilename).replace("'","z") if asin is None else asin
+    pinfile = os.path.join(inputdir,infilename + u".mobi")
+    poutfile = os.path.join(outputdir,infilename + u".mobi")
+    cmd = u'python "' + os.path.join(scriptdir, u"dualmetafix.py") +u'" "%s" "%s" "%s"' % (masin, pinfile,poutfile)
+
+    # Cyriilc file name fails here
+    # subprocess.call(cmd)
+
+    args = ["dualmetafix.py",masin,pinfile,poutfile]
+    dualmetafix.main(args)
+
+    # scriptdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+    # cmd = u'java -cp "' + os.path.join(scriptdir, u"MobiMetaEditorV0.16.jar") +u'" cli.WhisperPrep "%s" "%s"' % (inputdir, outputdir)
+    # print u"Running", cmd
+    # process = Popen(cmd, stdin=PIPE, stdout=sys.stdout, stderr=STDOUT)
+    # process.stdin.write(unidecode(infilename).replace("'","z") if asin is None else asin)
+    # process.stdin.write("\n")
+    # process.stdin.close()
+    # process.wait()
+
     shutil.copy(os.path.join(outputdir, infilename+u".mobi"), infilename+u".processed"+infileext)
     shutil.rmtree(u"images.$$$")
     shutil.rmtree(inputdir)
