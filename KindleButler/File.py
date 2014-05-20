@@ -28,18 +28,24 @@ from subprocess import STDOUT, PIPE
 from psutil import Popen
 from . import DualMetaFix
 from . import KindleUnpack
-from unidecode import unidecode
-import mobiunpack32_34
-import shutil
+# from unidecode import unidecode
 
 class MOBIFile:
-    def __init__(self, path, kindle, config, progressbar):
+    def __init__(self, path, kindle, config, progressbar,sequence_number,title,asin,position):
         self.config = config
         self.path = path
         self.kindle = kindle
+        self.seqnumber = sequence_number
+        self.title = title
+        self.asin = asin
+        self.position = position
+        self.write_thumb = True
+        if asin != None:
+            self.write_thumb = False
         # self.asin = str(uuid4())
         infilename = os.path.splitext(self.path)[0]
-        self.asin = unidecode(infilename).replace("'","z")
+        # self.asin = unidecode(infilename).replace("'","z") if asin is None else asin
+        self.asin = infilename.replace("'","z") if asin is None else asin
         self.progressbar = progressbar
         self.check_file()
     def check_file(self):
@@ -79,7 +85,8 @@ class MOBIFile:
                     raise OSError('Failed to upload cover!')
                 os.remove(tmp_cover)
             else:
-                ready_cover.save(os.path.join(self.kindle.path, 'system',
+                if(self.write_thumb):
+                    ready_cover.save(os.path.join(self.kindle.path, 'system',
                                               'thumbnails', 'thumbnail_' + self.asin + '_EBOK_portrait.jpg'), 'JPEG')
         try:
             # noinspection PyArgumentList
@@ -127,14 +134,104 @@ class MOBIFile:
         result = result[0:2]
         return result
 
+    def get_booktitle(self):
+        if self.title is None: return None
+        title = self.title
+        if self.title == 'auto':
+            section = KindleUnpack.Sectionizer(self.path)
+            mhlst = [KindleUnpack.MobiHeader(section, 0)]
+            mh = mhlst[0]
+            metadata = mh.getmetadata()
+            title = mh.title.decode("utf-8")
+        return title
+    def txt2img(self,title, seqnum, img, position):
+        try:
+            from PIL import Image, ImageDraw, ImageFont
+            # img = Image.open(img_in)
+            #prepare font
+            #font = 'PTC55F.ttf'
+            font = 'ARIALBD.TTF'
+            font_size = 35
+            font_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+            #prepare black/white text background
+            width, height = img.size
+            # mask position
+            xmask = 1.10 * font_size
+            if position=="bottom":
+                ymask = height - 1.10 * font_size
+            else:
+                ymask = 1.10 * font_size
+            haxis = font_size
+            #
+            #Select colors
+            #
+            #bgcolor = 'white'
+            #txtcolor = 'black'
+            bgcolor = 'black'
+            txtcolor = 'white'
+            draw = ImageDraw.Draw(img)  # setup to draw on the main image
+            fnt = ImageFont.truetype(os.path.join(font_dir, font), font_size)
+            if seqnum is not None:
+                #
+                #draw sequence number
+                #
+                #draw number background
+                draw.ellipse((xmask - haxis, ymask - haxis, xmask + haxis, ymask + haxis), fill=bgcolor)
+                #draw number
+                textwidth, textheight = fnt.getsize(seqnum)
+                draw.text((xmask - 0.5 * textwidth, ymask - 0.5 * textheight), seqnum, font=fnt, fill=txtcolor)
+
+            if title is not None:
+                # this is to calculate vertical position of text bg based on text parameter in general used
+                # for a sequence number (only textheight needed)
+                fake_text = 'fake'
+                # parameters of title text
+                textwidth, textheight = fnt.getsize(fake_text)
+                font_size2 = 15
+                fnt2 = ImageFont.truetype(os.path.join(font_dir, font), font_size2)
+                text2 = title.upper()
+                if seqnum is not None:
+                    draw.line((xmask + 0.5*haxis, ymask, xmask + haxis + 0.7 * width, ymask),fill=bgcolor,width=int(1.4*haxis))
+                    margin = xmask + haxis
+                    titlelength = 15
+                else:
+                    draw.line(( 0, ymask, width, ymask),fill=bgcolor,width=int(1.4*haxis))
+                    margin = 0.5*fnt2.getsize(text2)[1]
+                    titlelength = 27
+                textwidth2, textheight2 = fnt2.getsize(text2)
+                offset = ymask - 0.25*textheight2 if len(text2)<=20 else ymask - 0.6*textheight
+                #
+                #No wrap drawing
+                #
+                splits=[text2[x:x+titlelength] for x in range(0,len(text2),titlelength)]
+                ystep = fnt2.getsize(text2)[1]
+                for i in range (len(splits) if len(splits)<3 else 3):
+                    line = splits[i]
+                    draw.text((margin, offset), line, font=fnt2, fill=txtcolor)
+                    offset += ystep
+                #
+                # This is wrapping alternative
+                #
+                #for line in textwrap.wrap(text2, width=titlelength):
+                #    draw.text((margin, offset), line, font=fnt2, fill=txtcolor)
+                #    offset += fnt2.getsize(line)[1]
+
+            # img.save(img_out, "JPEG", quality=100)
+            del draw
+        except ImportError as e:
+            print ("Error:", e)
+            print ("Warning: Pillow is not installed - image text not drawn")
+
+
     def get_cover_image(self):
         section = KindleUnpack.Sectionizer(self.path)
         mhlst = [KindleUnpack.MobiHeader(section, 0)]
         mh = mhlst[0]
         metadata = mh.getmetadata()
         coverid = int(metadata['CoverOffset'][0])
-        title = mh.title.decode("utf-8")
+        title = self.get_booktitle()
         infilename = os.path.splitext(self.path)[0]
+        seqnum = self.get_seqnumber(infilename, self.seqnumber)
         beg = mh.firstresource
         end = section.num_sections
         imgnames = []
@@ -176,45 +273,6 @@ class MOBIFile:
                 # cover.thumbnail((250, 400), Image.ANTIALIAS)
                 cover = cover.resize((217,330), Image.ANTIALIAS)
                 cover = cover.convert('L')
-                seqnum = self.get_seqnumber(infilename, 'auto')
-                if seqnum!=None:
-                    # return cover
-                    #
-                    # Start drawing
-                    #
-                    position = 'bottom'
-                    #prepare font
-                    #font = 'PTC55F.ttf'
-                    font = 'ARIALBD.TTF'
-                    font_size = 35
-                    font_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-                    #prepare black/white text background
-                    width, height = cover.size
-                    # mask position
-                    xmask = 1.10 * font_size
-                    if position=="bottom":
-                        ymask = height - 1.10 * font_size
-                    else:
-                        ymask = 1.10 * font_size
-                    haxis = font_size
-                    #
-                    #Select colors
-                    #
-                    #bgcolor = 'white'
-                    #txtcolor = 'black'
-                    bgcolor = 'black'
-                    txtcolor = 'white'
-                    draw = ImageDraw.Draw(cover)  # setup to draw on the main image
-                    fnt = ImageFont.truetype(os.path.join(font_dir, font), font_size)
-                    if seqnum is not None:
-                       #
-                       #draw sequence number and number background
-                       #
-                       draw.ellipse((xmask - haxis, ymask - haxis, xmask + haxis, ymask + haxis), fill=bgcolor)
-                       #draw number
-                       textwidth, textheight = fnt.getsize(seqnum)
-                       draw.text((xmask - 0.5 * textwidth, ymask - 0.7 * textheight), seqnum, font=fnt, fill=txtcolor)
-                       # img.save(img_out, "JPEG", quality=100)
-                       del draw
+                self.txt2img(title, seqnum, cover, self.position)
                 return cover
         raise OSError
