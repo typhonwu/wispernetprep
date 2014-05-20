@@ -55,10 +55,10 @@ class KindleButlerGUI:
 
 
 class KindleButlerWorker:
-    def __init__(self, input_file, cover, ui, config):
+    def __init__(self, input_file, cover, ui, config,sequence_number,title,asin,position):
         try:
             kindle = Interface.Kindle(config)
-            file = File.MOBIFile(input_file, kindle, config, ui.pbar)
+            file = File.MOBIFile(input_file, kindle, config, ui.pbar,sequence_number,title,asin,position)
             file.save_file(cover)
             ui.root.quit()
         except OSError as e:
@@ -79,6 +79,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-c', '--cover', dest='custom_cover', action='store_true')
     parser.add_argument('input_file', type=str)
+    parser.add_argument('-s', '--sequence-number', help='A number to stamp on the cover ("auto" for first one-two characters of the name of the file)')
+    parser.add_argument('-t', '--title', help='A text to stamp on the cover ("auto" for the title from the metainfo of the book)')
+    parser.add_argument('-a', '--asin', help='A text to put into ASIN metainfo field')
+    parser.add_argument('-p', '--position', choices=['top', 'bottom'], default='bottom', help='Position of the stamp')
     args = parser.parse_args()
     configFile = configparser.ConfigParser()
     configFile.read('KindleButler.ini')
@@ -90,5 +94,5 @@ if __name__ == '__main__':
                 exit(0)
         else:
             cover_file = ''
-        Thread(target=KindleButlerWorker, args=(args.input_file, cover_file, gui, configFile)).start()
+        Thread(target=KindleButlerWorker, args=(args.input_file, cover_file, gui, configFile,args.sequence_number,args.title,args.asin,args.position)).start()
         gui.root.mainloop()
