@@ -179,7 +179,7 @@ class MOBIFile:
                 draw.ellipse((xmask - haxis, ymask - haxis, xmask + haxis, ymask + haxis), fill=bgcolor)
                 #draw number
                 textwidth, textheight = fnt.getsize(seqnum)
-                draw.text((xmask - 0.5 * textwidth, ymask - 0.5 * textheight), seqnum, font=fnt, fill=txtcolor)
+                draw.text((xmask - 0.5 * textwidth, ymask - 0.7 * textheight), seqnum, font=fnt, fill=txtcolor)
 
             if title is not None:
                 # this is to calculate vertical position of text bg based on text parameter in general used
@@ -199,12 +199,12 @@ class MOBIFile:
                     margin = 0.5*fnt2.getsize(text2)[1]
                     titlelength = 27
                 textwidth2, textheight2 = fnt2.getsize(text2)
-                offset = ymask - 0.25*textheight2 if len(text2)<=20 else ymask - 0.6*textheight
+                offset = ymask - 1.1*textheight2 if len(text2)<=20 else ymask - 0.7*textheight
                 #
                 #No wrap drawing
                 #
                 splits=[text2[x:x+titlelength] for x in range(0,len(text2),titlelength)]
-                ystep = fnt2.getsize(text2)[1]
+                ystep = 1.1*fnt2.getsize(text2)[1]
                 for i in range (len(splits) if len(splits)<3 else 3):
                     line = splits[i]
                     draw.text((margin, offset), line, font=fnt2, fill=txtcolor)
