@@ -197,7 +197,7 @@ class MOBIFile:
                 else:
                     draw.line(( 0, ymask, width, ymask),fill=bgcolor,width=int(1.4*haxis))
                     margin = 0.5*fnt2.getsize(text2)[1]
-                    titlelength = 27
+                    titlelength = 21
                 textwidth2, textheight2 = fnt2.getsize(text2)
                 offset = ymask - 1.1*textheight2 if len(text2)<=20 else ymask - 0.7*textheight
                 #
