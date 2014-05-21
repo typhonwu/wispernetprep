@@ -151,7 +151,7 @@ class DualMobiMetaFix:
         rec0 = del_exth(rec0, 504)
         rec0 = add_exth(rec0, 501, b'EBOK')
         rec0 = add_exth(rec0, 113, self.asin)
-        rec0 = add_exth(rec0, 504, self.asin)
+        # rec0 = add_exth(rec0, 504, self.asin)
         self.datain = replacesection(self.datain, 0, rec0)
 
         ver = getint(self.datain_rec0, mobi_version)
