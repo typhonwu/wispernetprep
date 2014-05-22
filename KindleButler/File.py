@@ -73,7 +73,8 @@ class MOBIFile:
                 try:
                     ready_cover = self.get_cover_image()
                 except:
-                    raise OSError('Failed to extract cover!')
+                    if(self.write_thumb):
+                        raise OSError('Failed to extract cover!')
             if self.kindle.ssh:
                 tmp_cover = os.path.join(gettempdir(), 'KindleButlerCover')
                 ready_cover.save(tmp_cover, 'JPEG')
