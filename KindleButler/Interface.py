@@ -24,11 +24,12 @@ from psutil import disk_partitions, disk_usage, Popen
 
 
 class Kindle:
-    def __init__(self, config):
+    def __init__(self, config, mode):
         self.config = config
         self.ssh = False
-        self.path = self.find_device()
-        self.need_cover = self.check_thumbnails()
+        if mode=='reader':
+            self.path = self.find_device()
+            self.need_cover = self.check_thumbnails()
 
     def find_device(self):
         for drive in disk_partitions(False):
