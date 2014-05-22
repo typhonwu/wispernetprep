@@ -72,7 +72,8 @@ class MOBIFile:
                 if cover != '':
                     try:
                         ready_cover = Image.open(cover)
-                        ready_cover.thumbnail((217, 330), Image.ANTIALIAS)
+                        # ready_cover.thumbnail((217, 330), Image.ANTIALIAS)
+                        ready_cover = ready_cover.resize((250, 400), Image.ANTIALIAS)
                         ready_cover = ready_cover.convert('L')
                     except:
                         raise OSError('Failed to load custom cover!')
@@ -150,7 +151,7 @@ class MOBIFile:
                 ready_cover.save('thumbnail_' + self.asin + '_EBOK_portrait.jpg', 'JPEG')
              #save processed file
             saved = 0
-            ready_file.seek(0)
+            # ready_file.seek(0)
             target = open(self.infilename + '.processed' + self.infileext, 'wb')
             while True:
                 chunk = ready_file.read(32768)
@@ -307,7 +308,8 @@ class MOBIFile:
                 cover = Image.open(BytesIO(data))
                 # cover.thumbnail((217, 330), Image.ANTIALIAS)
                 # cover.thumbnail((250, 400), Image.ANTIALIAS)
-                cover = cover.resize((217,330), Image.ANTIALIAS)
+                # cover = cover.resize((217,330), Image.ANTIALIAS)
+                cover = cover.resize((250,400), Image.ANTIALIAS)
                 cover = cover.convert('L')
                 self.txt2img(title, seqnum, cover, self.position)
                 return cover
