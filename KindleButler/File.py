@@ -50,6 +50,13 @@ class MOBIFile:
         # self.asin = unidecode(infilename).replace("'","z") if asin is None else asin
         self.asin = self.infilename.replace("'","z") if asin is None else asin
         self.progressbar = progressbar
+        # get title and seqnum
+        section = KindleUnpack.Sectionizer(self.path)
+        mhlst = [KindleUnpack.MobiHeader(section, 0)]
+        mh = mhlst[0]
+        metadata = mh.getmetadata()
+        self.title = self.get_booktitle()
+        self.seqnumber = self.get_seqnumber(self.infilename, self.seqnumber)
         self.check_file()
 
     def check_file(self):
@@ -254,7 +261,6 @@ class MOBIFile:
                 #    draw.text((margin, offset), line, font=fnt2, fill=txtcolor)
                 #    offset += fnt2.getsize(line)[1]
 
-            # img.save(img_out, "JPEG", quality=100)
             del draw
         except ImportError as e:
             print ("Error:", e)
@@ -267,9 +273,6 @@ class MOBIFile:
         mh = mhlst[0]
         metadata = mh.getmetadata()
         coverid = int(metadata['CoverOffset'][0])
-        title = self.get_booktitle()
-        infilename = os.path.splitext(self.path)[0]
-        seqnum = self.get_seqnumber(infilename, self.seqnumber)
         beg = mh.firstresource
         end = section.num_sections
         imgnames = []
@@ -311,6 +314,6 @@ class MOBIFile:
                 # cover.thumbnail((250, 400), Image.ANTIALIAS)
                 cover = cover.resize((217,330), Image.ANTIALIAS)
                 cover = cover.convert('L')
-                self.txt2img(title, seqnum, cover, self.position)
+                self.txt2img(self.title, self.seqnumber, cover, self.position)
                 return cover
         raise OSError
