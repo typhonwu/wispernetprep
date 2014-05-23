@@ -73,7 +73,7 @@ class MOBIFile:
                     try:
                         ready_cover = Image.open(cover)
                         # ready_cover.thumbnail((217, 330), Image.ANTIALIAS)
-                        ready_cover = ready_cover.resize((250, 400), Image.ANTIALIAS)
+                        ready_cover = ready_cover.resize((217, 330), Image.ANTIALIAS)
                         ready_cover = ready_cover.convert('L')
                     except:
                         raise OSError('Failed to load custom cover!')
@@ -308,8 +308,7 @@ class MOBIFile:
                 cover = Image.open(BytesIO(data))
                 # cover.thumbnail((217, 330), Image.ANTIALIAS)
                 # cover.thumbnail((250, 400), Image.ANTIALIAS)
-                # cover = cover.resize((217,330), Image.ANTIALIAS)
-                cover = cover.resize((250,400), Image.ANTIALIAS)
+                cover = cover.resize((217,330), Image.ANTIALIAS)
                 cover = cover.convert('L')
                 self.txt2img(title, seqnum, cover, self.position)
                 return cover
