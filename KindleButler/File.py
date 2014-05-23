@@ -75,6 +75,7 @@ class MOBIFile:
                         # ready_cover.thumbnail((217, 330), Image.ANTIALIAS)
                         ready_cover = ready_cover.resize((217, 330), Image.ANTIALIAS)
                         ready_cover = ready_cover.convert('L')
+                        self.txt2img(self.title, self.seqnumber, ready_cover, self.position)
                     except:
                         raise OSError('Failed to load custom cover!')
                 else:
