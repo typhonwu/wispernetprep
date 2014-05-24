@@ -37,7 +37,8 @@ class Kindle:
                 if os.path.isdir(os.path.join(drive[1], 'system')) and \
                         os.path.isdir(os.path.join(drive[1], 'documents')):
                     return drive[1]
-        if self.config['GENERAL']['SSHEnabled']:
+        print(self.config['GENERAL']['SSHEnabled'])
+        if self.config['GENERAL']['SSHEnabled'] == "True":
             ssh = Popen('"' + self.config['SSH']['PLinkPath'] + '" root@' + self.config['SSH']['KindleIP']
                         + ' whoami', stdout=PIPE, stderr=STDOUT, shell=True)
             ssh_check = ssh.wait()
