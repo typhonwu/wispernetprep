@@ -150,11 +150,21 @@ class MOBIFile:
         if(self.mode=='pc'):
             # prepare and save cover
             # if key -a asin then self.write_thumb=False and no need to save cover
-            try:
-                ready_cover = self.get_cover_image()
-            except:
-                if(self.write_thumb):
-                    raise OSError('Failed to extract cover!')
+            if cover != '': # means that cover was imported from external file
+                try:
+                    ready_cover = Image.open(cover)
+                    # ready_cover.thumbnail((217, 330), Image.ANTIALIAS)
+                    ready_cover = ready_cover.resize((217, 330), Image.ANTIALIAS)
+                    ready_cover = ready_cover.convert('L')
+                    self.txt2img(self.title, self.seqnumber, ready_cover, self.position)
+                except:
+                    raise OSError('Failed to load custom cover!')
+            else:
+                try:
+                    ready_cover = self.get_cover_image()
+                except:
+                    if(self.write_thumb):
+                        raise OSError('Failed to extract cover!')
             if(self.write_thumb):
                 ready_cover.save('thumbnail_' + self.asin + '_EBOK_portrait.jpg', 'JPEG')
              #save processed file
