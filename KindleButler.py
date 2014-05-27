@@ -19,7 +19,7 @@ __version__ = '0.1'
 __license__ = 'GPL-3'
 __copyright__ = '2014, Pawel Jastrzebski <pawelj@vulturis.eu>'
 
-import os
+import os,inspect
 import sys
 import argparse
 import configparser
@@ -87,7 +87,9 @@ if __name__ == '__main__':
     parser.add_argument('-m', '--mode', choices=['pc', 'reader'], default='reader', help='Mode of operation: Write files to Kindle/PC')
     args = parser.parse_args()
     configFile = configparser.ConfigParser()
-    configFile.read('KindleButler.ini')
+    scriptdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+    path_to_ini = scriptdir + '\\KindleButler.ini'
+    configFile.read(path_to_ini)
     if args.input_file != '':
         gui = KindleButlerGUI()
         if args.custom_cover:
