@@ -28,7 +28,10 @@ from subprocess import STDOUT, PIPE
 from psutil import Popen
 from . import DualMetaFix
 from . import KindleUnpack
-# from unidecode import unidecode
+import mobiunpack32_34
+import errno
+import extractcover_34
+import shutil
 
 class MOBIFile:
     def __init__(self, path, kindle, config, progressbar,sequence_number,title,asin,position,mode):
@@ -71,8 +74,14 @@ class MOBIFile:
         if ident != b'BOOKMOBI':
             raise OSError('The specified file is not E-Book!')
 
+    def make_sure_path_exists(self,path):
+        try:
+            os.makedirs(path)
+        except OSError as exception:
+            if exception.errno != errno.EEXIST:
+                raise
 
-    def save_file(self, cover):
+    def save_file(self, cover,directory,getcover):
         if(self.mode=='reader'):
             #  need.cover means that directory system/thumbnails has been found on the Kindle (this is Kindle PW)
             if self.kindle.need_cover:
@@ -86,11 +95,27 @@ class MOBIFile:
                     except:
                         raise OSError('Failed to load custom cover!')
                 else:
-                    try:
-                        ready_cover = self.get_cover_image()
-                    except:
-                        if(self.write_thumb):
-                            raise OSError('Failed to extract cover!')
+                    if getcover=='search': # search for cover
+                        try:
+                           ready_cover = self.get_cover_image()
+                        except:
+                            if(self.write_thumb):
+                                raise OSError('Failed to extract cover!')
+                    else: # extract cover
+                        try:
+                            # ready_cover = self.get_cover_image()
+                            extractcover_34.extractThumbnail(self.path, "tmpdir.$$$");
+                            shutil.rmtree("tmpdir.$$$")
+                            coverfile = 'images.$$$' + '\\' + self.infilename +'.cover' + '.jpeg'
+                            ready_cover = Image.open(coverfile)
+                            ready_cover = ready_cover.resize((217, 330), Image.ANTIALIAS)
+                            ready_cover = ready_cover.convert('L')
+                            self.txt2img(self.title, self.seqnumber, ready_cover, self.position)
+                        except:
+                            if(self.write_thumb):
+                                shutil.rmtree("images.$$$")
+                                raise OSError('Failed to extract cover!')
+
                 if self.kindle.ssh:
                     tmp_cover = os.path.join(gettempdir(), 'KindleButlerCover')
                     ready_cover.save(tmp_cover, 'JPEG')
@@ -135,7 +160,13 @@ class MOBIFile:
                           stdout=PIPE, stderr=STDOUT, shell=True)
                 else:
                     saved = 0
-                    target = open(os.path.join(self.kindle.path, 'documents', os.path.basename(self.path)), 'wb')
+                    if directory == None:
+                        target = open(os.path.join(self.kindle.path, 'documents', os.path.basename(self.path)), 'wb')
+                    else:
+                        new_dir = self.kindle.path + 'documents' + '\\' + directory
+                        self.make_sure_path_exists(new_dir)
+                        target = open(new_dir + '\\' + os.path.basename(self.path), 'wb')
+                        # target = open(os.path.join(self.kindle.path, 'documents' + '\\directory', os.path.basename(self.path)), 'wb')
                     while True:
                         chunk = ready_file.read(32768)
                         if not chunk:
@@ -153,20 +184,37 @@ class MOBIFile:
             if cover != '': # means that cover was imported from external file
                 try:
                     ready_cover = Image.open(cover)
-                    # ready_cover.thumbnail((217, 330), Image.ANTIALIAS)
                     ready_cover = ready_cover.resize((217, 330), Image.ANTIALIAS)
                     ready_cover = ready_cover.convert('L')
                     self.txt2img(self.title, self.seqnumber, ready_cover, self.position)
                 except:
                     raise OSError('Failed to load custom cover!')
-            else:
-                try:
-                    ready_cover = self.get_cover_image()
-                except:
-                    if(self.write_thumb):
-                        raise OSError('Failed to extract cover!')
+            else: # search/extract cover from inside the book
+                if(getcover=='search'): #search for cover
+                    try:
+                       ready_cover = self.get_cover_image()
+                    except:
+                        if(self.write_thumb):
+                            raise OSError('Failed to extract cover!')
+                else: #extract the cover from the book
+                    try:
+                        # ready_cover = self.get_cover_image()
+                        extractcover_34.extractThumbnail(self.path, "tmpdir.$$$");
+                        shutil.rmtree("tmpdir.$$$")
+                        coverfile = 'images.$$$' + '\\' + self.infilename +'.cover' + '.jpeg'
+                        ready_cover = Image.open(coverfile)
+                        ready_cover = ready_cover.resize((217, 330), Image.ANTIALIAS)
+                        ready_cover = ready_cover.convert('L')
+                        self.txt2img(self.title, self.seqnumber, ready_cover, self.position)
+                    except:
+                        if(self.write_thumb):
+                            # shutil.rmtree("images.$$$")
+                            raise OSError('Failed to extract cover!')
+
             if(self.write_thumb):
                 ready_cover.save('thumbnail_' + self.asin + '_EBOK_portrait.jpg', 'JPEG')
+                if getcover !='search':
+                    shutil.rmtree("images.$$$")
              #save processed file
             saved = 0
             # ready_file.seek(0)
