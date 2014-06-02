@@ -55,12 +55,12 @@ class KindleButlerGUI:
 
 
 class KindleButlerWorker:
-    def __init__(self, input_file, cover, ui, config,sequence_number,title,asin,position,mode):
+    def __init__(self, input_file, cover, ui, config,sequence_number,title,asin,position,mode,directory, getcover):
         try:
             # looks for Kindle PW and checks it out
             kindle = Interface.Kindle(config, mode)
             file = File.MOBIFile(input_file, kindle, config, ui.pbar,sequence_number,title,asin,position,mode)
-            file.save_file(cover)
+            file.save_file(cover,directory,getcover)
             ui.root.quit()
         except OSError as e:
             ui.label.grid(row=1)
@@ -84,7 +84,9 @@ if __name__ == '__main__':
     parser.add_argument('-t', '--title', help='A text to stamp on the cover ("auto" for the title from the metainfo of the book)')
     parser.add_argument('-a', '--asin', help='A text to put into ASIN metainfo field')
     parser.add_argument('-p', '--position', choices=['top', 'bottom'], default='bottom', help='Position of the stamp')
-    parser.add_argument('-m', '--mode', choices=['pc', 'reader'], default='reader', help='Mode of operation: Write files to Kindle/PC')
+    parser.add_argument('-m', '--mode', choices=['pc', 'reader'], default='reader', help='Mode of operation: Write files to Kindle/to PC')
+    parser.add_argument('-d', '--directory',help='Kindle Documents subdirectory')
+    parser.add_argument('-e', '--getcover', choices=['search', 'extract'], default='search', help='Method of obtaining cover: Search/Extract')
     args = parser.parse_args()
     configFile = configparser.ConfigParser()
     scriptdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -98,5 +100,6 @@ if __name__ == '__main__':
                 exit(0)
         else:
             cover_file = ''
-        Thread(target=KindleButlerWorker, args=(args.input_file, cover_file, gui, configFile,args.sequence_number,args.title,args.asin,args.position,args.mode)).start()
+        Thread(target=KindleButlerWorker, args=(args.input_file, cover_file, gui, configFile,args.sequence_number,
+                            args.title,args.asin,args.position,args.mode, args.directory, args.getcover)).start()
         gui.root.mainloop()
