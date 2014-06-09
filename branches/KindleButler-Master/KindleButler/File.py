@@ -213,7 +213,7 @@ class MOBIFile:
 
             if(self.write_thumb):
                 ready_cover.save('thumbnail_' + self.asin + '_EBOK_portrait.jpg', 'JPEG')
-                if getcover !='search':
+                if getcover !='search' and cover == '':
                     shutil.rmtree("images.$$$")
              #save processed file
             saved = 0
