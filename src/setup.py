@@ -18,8 +18,7 @@ try:
 except:
     pass
 
-includes = [
-]
+includes = []
 
 dll_excludes = [
     'w9xpopen.exe'
