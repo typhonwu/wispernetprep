@@ -4,7 +4,6 @@ import sys
 import os
 
 base_dir = os.path.abspath(os.path.dirname(sys.argv[0]))
-#sys.path.append(os.path.join(base_dir, 'modules'))
 sys.path.append(os.path.join(base_dir, 'unidecode'))
 
 sys.argv.append('py2exe')
@@ -17,6 +16,7 @@ try:
     shutil.rmtree(os.path.join(base_dir, 'dist'))
 except:
     pass
+additional_files = [('', ['PTC55F.ttf'])]
 
 includes = []
 
@@ -47,6 +47,7 @@ setup(
         }
     },
     console=['wispernetprep.py'],
+    data_files=additional_files,
     zipfile=None
 )
 
