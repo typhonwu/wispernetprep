@@ -4,8 +4,6 @@ import sys
 import os
 
 base_dir = os.path.abspath(os.path.dirname(sys.argv[0]))
-sys.path.append(os.path.join(base_dir, 'unidecode'))
-
 sys.argv.append('py2exe')
 
 try:
