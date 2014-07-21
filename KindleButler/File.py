@@ -252,8 +252,8 @@ class MOBIFile:
             from PIL import Image, ImageDraw, ImageFont
             # img = Image.open(img_in)
             #prepare font
-            #font = 'PTC55F.ttf'
-            font = 'ARIALBD.TTF'
+            font = 'PTC55F.ttf'
+            #font = 'ARIALBD.TTF'
             font_size = 35
             font_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
             #prepare black/white text background
