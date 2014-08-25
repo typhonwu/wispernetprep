@@ -55,12 +55,12 @@ class KindleButlerGUI:
 
 
 class KindleButlerWorker:
-    def __init__(self, input_file, cover, ui, config,sequence_number,title,asin,position,mode,directory, getcover):
+    def __init__(self, input_file, cover, ui, config,sequence_number,title,asin,position,mode,directory, getcover, cloud):
         try:
             # looks for Kindle PW and checks it out
             kindle = Interface.Kindle(config, mode)
-            file = File.MOBIFile(input_file, kindle, config, ui.pbar,sequence_number,title,asin,position,mode)
-            file.save_file(cover,directory,getcover)
+            file = File.MOBIFile(input_file, kindle, config, ui.pbar,sequence_number,title,asin,position,mode,cloud)
+            file.save_file(cover,directory,getcover,cloud)
             ui.root.quit()
         except OSError as e:
             ui.label.grid(row=1)
@@ -87,6 +87,7 @@ if __name__ == '__main__':
     parser.add_argument('-m', '--mode', choices=['pc', 'reader'], default='reader', help='Mode of operation: Write files to PC/to Paperwhite')
     parser.add_argument('-d', '--directory',help='Kindle Documents subdirectory')
     parser.add_argument('-e', '--getcover', choices=['search', 'extract'], default='search', help='Method of obtaining cover: Search/Extract')
+    parser.add_argument('-cl', '--cloud',choices=['yes', 'no'], default='no', help='Process book for cloud?')
     args = parser.parse_args()
     configFile = configparser.ConfigParser()
     scriptdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -101,5 +102,5 @@ if __name__ == '__main__':
         else:
             cover_file = ''
         Thread(target=KindleButlerWorker, args=(args.input_file, cover_file, gui, configFile,args.sequence_number,
-                            args.title,args.asin,args.position,args.mode, args.directory, args.getcover)).start()
+                            args.title,args.asin,args.position,args.mode, args.directory, args.getcover,args.cloud)).start()
         gui.root.mainloop()

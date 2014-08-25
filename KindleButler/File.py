@@ -34,7 +34,7 @@ import extractcover_34
 import shutil
 
 class MOBIFile:
-    def __init__(self, path, kindle, config, progressbar,sequence_number,title,asin,position,mode):
+    def __init__(self, path, kindle, config, progressbar,sequence_number,title,asin,position,mode,cloud):
         self.mode = mode
         self.config = config
         self.path = path
@@ -50,7 +50,6 @@ class MOBIFile:
         # self.asin = str(uuid4())
         self.infilename = os.path.splitext(self.path)[0]
         self.infileext = os.path.splitext(self.path)[1]
-        # self.asin = unidecode(infilename).replace("'","z") if asin is None else asin
         self.asin = self.infilename.replace("'","z") if asin is None else asin
         self.progressbar = progressbar
         # get title and seqnum
@@ -81,7 +80,7 @@ class MOBIFile:
             if exception.errno != errno.EEXIST:
                 raise
 
-    def save_file(self, cover,directory,getcover):
+    def save_file(self, cover,directory,getcover,cloud):
         if(self.mode=='reader'):
             #  need.cover means that directory system/thumbnails has been found on the Kindle (this is Kindle PW)
             if self.kindle.need_cover:
@@ -129,12 +128,26 @@ class MOBIFile:
                     os.remove(tmp_cover)
                 else:
                     if(self.write_thumb):
-                        ready_cover.save(os.path.join(self.kindle.path, 'system',
+                        if(cloud=='no'):
+                            ready_cover.save(os.path.join(self.kindle.path, 'system',
                                                   'thumbnails', 'thumbnail_' + self.asin + '_EBOK_portrait.jpg'), 'JPEG')
+                        else:
+                            # get ASIN from file
+                            section = KindleUnpack.Sectionizer(self.path)
+                            mhlst = [KindleUnpack.MobiHeader(section, 0)]
+                            mh = mhlst[0]
+                            metadata = mh.getmetadata()
+                            assa = metadata.get('ASIN')
+                            assassin = assa[0].decode("utf-8")
+                            if assassin==None:
+                                assassin='None'
+                            ready_cover.save(os.path.join(self.kindle.path, 'system',
+                                                  'thumbnails', 'thumbnail_' +  assassin + '_PDOC_portrait.jpg'), 'JPEG')
+
         # for all modes prepare processed file
         try:
             # noinspection PyArgumentList
-            ready_file = DualMetaFix.DualMobiMetaFix(self.path, bytes(self.asin, 'UTF-8'))
+            ready_file = DualMetaFix.DualMobiMetaFix(self.path, bytes(self.asin,'UTF-8'),cloud)
         except:
             raise OSError('E-Book modification failed!')
         ready_file, source_size = ready_file.getresult()
@@ -160,21 +173,22 @@ class MOBIFile:
                           ' "dbus-send --system /default com.lab126.powerd.resuming int32:1"',
                           stdout=PIPE, stderr=STDOUT, shell=True)
                 else:
-                    saved = 0
-                    if directory == None:
-                        target = open(os.path.join(self.kindle.path, 'documents', os.path.basename(self.path)), 'wb')
-                    else:
-                        new_dir = self.kindle.path + 'documents' + '\\' + directory
-                        self.make_sure_path_exists(new_dir)
-                        target = open(new_dir + '\\' + os.path.basename(self.path), 'wb')
-                        # target = open(os.path.join(self.kindle.path, 'documents' + '\\directory', os.path.basename(self.path)), 'wb')
-                    while True:
-                        chunk = ready_file.read(32768)
-                        if not chunk:
-                            break
-                        target.write(chunk)
-                        saved += len(chunk)
-                        self.progressbar['value'] = int((saved/source_size)*100)
+                    if cloud=='no':
+                        saved = 0
+                        if directory == None:
+                            target = open(os.path.join(self.kindle.path, 'documents', os.path.basename(self.path)), 'wb')
+                        else:
+                            new_dir = self.kindle.path + 'documents' + '\\' + directory
+                            self.make_sure_path_exists(new_dir)
+                            target = open(new_dir + '\\' + os.path.basename(self.path), 'wb')
+                            # target = open(os.path.join(self.kindle.path, 'documents' + '\\directory', os.path.basename(self.path)), 'wb')
+                        while True:
+                            chunk = ready_file.read(32768)
+                            if not chunk:
+                                break
+                            target.write(chunk)
+                            saved += len(chunk)
+                            self.progressbar['value'] = int((saved/source_size)*100)
             else:
                 raise OSError('Not enough space on target device!')
 
@@ -213,20 +227,33 @@ class MOBIFile:
                             raise OSError('Failed to extract cover!')
 
             if(self.write_thumb):
-                ready_cover.save('thumbnail_' + self.asin + '_EBOK_portrait.jpg', 'JPEG')
+                if cloud=='no':
+                     ready_cover.save('thumbnail_' + self.asin + '_EBOK_portrait.jpg', 'JPEG')
+                else:
+                    # get ASIN from file
+                    section = KindleUnpack.Sectionizer(self.path)
+                    mhlst = [KindleUnpack.MobiHeader(section, 0)]
+                    mh = mhlst[0]
+                    metadata = mh.getmetadata()
+                    assa = metadata.get('ASIN')
+                    assassin = assa[0].decode("utf-8")
+                    if assassin==None:
+                        assassin='None'
+                    ready_cover.save('thumbnail_' + assassin + '_EBOK_portrait.jpg', 'JPEG')
                 if getcover !='search' and cover == '':
                     shutil.rmtree("images.$$$")
-             #save processed file
-            saved = 0
-            # ready_file.seek(0)
-            target = open(self.infilename + '.processed' + self.infileext, 'wb')
-            while True:
-                chunk = ready_file.read(32768)
-                if not chunk:
-                    break
-                target.write(chunk)
-                saved += len(chunk)
-                self.progressbar['value'] = int((saved/source_size)*100)
+                if cloud=='no':
+                    #save processed file
+                    saved = 0
+                    # ready_file.seek(0)
+                    target = open(self.infilename + '.processed' + self.infileext, 'wb')
+                    while True:
+                        chunk = ready_file.read(32768)
+                        if not chunk:
+                            break
+                        target.write(chunk)
+                        saved += len(chunk)
+                        self.progressbar['value'] = int((saved/source_size)*100)
 
 
     def get_seqnumber(self,infilename, seqnumber):
