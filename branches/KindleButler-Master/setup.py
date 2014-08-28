@@ -1,9 +1,4 @@
 """
-To make bundle_files: 0 or 1 working exclude tkinter:
-'excludes': ['tkconstants', 'tkinter'],
-
-Alas, tkinter needed, no way to exclude it!
-
 Usage (Windows):
     python setup.py py2exe
 """
@@ -19,6 +14,8 @@ if platform == "win32":
     from distutils.core import setup
     additional_files = [('', ['LICENSE.txt',
                               'KindleButler.ini'])]
+    mydata = [('', ['PTC55F.ttf'])]
+
     extra_options = dict(
         options={'py2exe': {"bundle_files": 2,
                             "dist_dir": "dist",
@@ -33,8 +30,9 @@ if platform == "win32":
                   "product_name": "kindlewisper",
                   "file_description": "kindlewisper",
                   "icon_resources": [(1, "Assets\KindleButler.ico")]}],
+        #zipfile='lib/library.zip',
         zipfile=None,
-        data_files=additional_files)
+        data_files=mydata)
 else:
     print('This script create only Windows releases.')
     exit()

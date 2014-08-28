@@ -283,7 +283,11 @@ class MOBIFile:
             font = 'PTC55F.ttf'
             #font = 'ARIALBD.TTF'
             font_size = 35
-            font_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+            try:
+                if sys.frozen or sys.importers:
+                   font_dir = os.path.dirname(sys.executable)
+            except AttributeError:
+                   font_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
             #prepare black/white text background
             width, height = img.size
             # mask position
